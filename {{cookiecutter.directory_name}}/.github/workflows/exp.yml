@@ -46,15 +46,15 @@ jobs:
           chmod -R 777 {{ "${{ env.WORKSPACE}}" }}
       - name: build environment
         run: |
-          echo x-x-x-x-x-x-x-x-x-x-x ${{ env.DATE}} x-x-x-x-x-x-x-x-x-x-x
+          echo x-x-x-x-x-x-x-x-x-x-x {{ "${{ env.DATE}}" }}" x-x-x-x-x-x-x-x-x-x-x
           echo "---------------source bash---------------"
           . ~/.bashrc
           echo "---------------CUDA---------------"
-          export PATH="${{ env.CUDA_HOME}}/bin:$PATH"
-          export LD_LIBRARY_PATH="${{ env.CUDA_HOME}}/lib64:$LD_LIBRARY_PATH"
+          export PATH="{{ "${{ env.CUDA_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CUDA_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
           echo "---------------CMAKE---------------"
-          export PATH="${{ env.CMAKE_HOME}}/bin:$PATH"
-          export LD_LIBRARY_PATH="${{ env.CMAKE_HOME}}/lib64:$LD_LIBRARY_PATH"
+          export PATH="{{ "${{ env.CMAKE_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CMAKE_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
           echo "---------------source conda env---------------"
           conda env create -f environment.yml
           conda activate {{ "${{ env.CONDA_ENV}}" }}
