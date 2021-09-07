@@ -7,7 +7,7 @@
 pip install cookiecutter
 
 # render the template
-cookiecutter https://github.com/sudomaze/cookiecutter-pytorch-lightning.git
+cookiecutter https://github.com/sudomaze/cookiecutter-pytorch-lightning-cluster.git
 ```
 
 ## Contributors
