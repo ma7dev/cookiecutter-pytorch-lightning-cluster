@@ -40,6 +40,7 @@ line-length = 120 # override the default of 88
 [tool.poetry.scripts]
 train = "scripts.train:train"
 test = "scripts.test:test"
+_train = "scripts._train.sh"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -4,7 +4,7 @@ import fire
 from train import train
 
 
-def main(config_path: str, selected: List = [], all: bool = False, gpus: str = "0"):
+def main(config_path: str, selected: List = [], all: bool = False):
     experiments = yaml.load(open(config_path), Loader=yaml.FullLoader)
     root_path = experiments["ROOT_PATH"]
     print(root_path)
@@ -12,19 +12,18 @@ def main(config_path: str, selected: List = [], all: bool = False, gpus: str = "
     print(config_path)
     print(selected)
     print(all)
-    print(gpus)
     if all:
         for experiment, _ in experiments.items():
             print(experiment)
-            train(config_path, experiment, gpus)
+            train(config_path, experiment)
     elif selected:
         if type(selected) == str:
             print(selected)
-            train(config_path, selected, gpus)
+            train(config_path, selected)
         else:
             for experiment in selected:
                 print(experiment)
-                train(config_path, experiment, gpus)
+                train(config_path, experiment)
     else:
         print("nothing selected")
 

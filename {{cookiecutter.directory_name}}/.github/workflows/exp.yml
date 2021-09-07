@@ -1,0 +1,102 @@
+name: Automated Experiments
+on:
+  push:
+    branches: [ exp ]
+jobs:
+  build_on_{{cookiecutter.runner_slug}}:
+    runs-on: [ {{cookiecutter.runner_slug}} ]
+    timeout-minutes: 4320
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      MACHINE_NUM: "1"
+      CONDA_FOLDER: "miniconda3"
+      SCRATCH_PATH: "/nfs/hpc/share"
+      CONFIG_PATH: "experiments"
+      EXPERIMENTS: "main"
+      CONDA_ENV: "{{cookiecutter.project_slug}}"
+      CUDA_HOME: "/usr/local/apps/cuda/cuda-11.1"
+      CMAKE_HOME: "/usr/local/apps/cmake/3.14.5"
+    steps:
+      - uses: actions/checkout@v2
+      - name: set environment variables
+        run: |
+          echo "---------------set environment variables---------------"
+          export DATE=$(date "+%Y-%m-%d-%H-%M-%S")
+          export SCRATCH={{ "${{ env.SCRATCH_PATH}}" }}/$USER
+          export WORKSPACE=$SCRATCH/actions-runner-{{ "${{ env.MACHINE_NUM}}" }}/_work/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}
+          export CONFIG="$WORKSPACE/config/{{ "${{ env.CONFIG_PATH}}" }}.yml"
+          export CONDA_PATH=$SCRATCH/{{ "${{ env.CONDA_FOLDER}}" }}/condabin/conda
+          export PYTHON=$SCRATCH/{{ "${{ env.CONDA_FOLDER}}" }}/envs/{{ "${{ env.CONDA_ENV}}" }}/bin/python
+          echo "---------------add to GITHUB ENV---------------"
+          echo "DATE=$DATE" >> $GITHUB_ENV
+          echo "SCRATCH=$SCRATCH" >> $GITHUB_ENV
+          echo "WORKSPACE=$WORKSPACE" >> $GITHUB_ENV
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+          echo "CONDA_PATH=$CONDA_PATH" >> $GITHUB_ENV
+          echo "PYTHON=$PYTHON" >> $GITHUB_ENV
+      - name: set permission
+        run: |
+          echo x-x-x-x-x-x-x-x-x-x-x {{ "${{ env.DATE}}" }} x-x-x-x-x-x-x-x-x-x-x
+          
+          echo "---------------source bash---------------"
+          . ~/.bashrc
+          echo "---------------permissions---------------"
+          chmod -R 777 {{ "${{ env.WORKSPACE}}" }}
+      - name: build environment
+        run: |
+          echo x-x-x-x-x-x-x-x-x-x-x ${{ env.DATE}} x-x-x-x-x-x-x-x-x-x-x
+          echo "---------------source bash---------------"
+          . ~/.bashrc
+          echo "---------------CUDA---------------"
+          export PATH="${{ env.CUDA_HOME}}/bin:$PATH"
+          export LD_LIBRARY_PATH="${{ env.CUDA_HOME}}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------CMAKE---------------"
+          export PATH="${{ env.CMAKE_HOME}}/bin:$PATH"
+          export LD_LIBRARY_PATH="${{ env.CMAKE_HOME}}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------source conda env---------------"
+          conda env create -f environment.yml
+          conda activate {{ "${{ env.CONDA_ENV}}" }}
+          poetry install
+          wandb --relogin {{ "${{ secrets.WANDB_API }}" }}
+          [ -z "$(conda env list | grep {{ "${{ env.CONDA_ENV}})" }}" ] && {{ "${{ env.CONDA_PATH}}" }} env create -f environment.yml
+          source activate {{ "${{ env.CONDA_ENV}}" }}
+          poetry install
+          wandb login --relogin {{ "${{ secrets.WANDB_API }}" }}
+      - name: server information
+        run: |
+          echo x-x-x-x-x-x-x-x-x-x-x {{ "${{ env.DATE}}" }} x-x-x-x-x-x-x-x-x-x-x
+          
+          echo "---------------source bash---------------"
+          . ~/.bashrc
+          echo "---------------CUDA---------------"
+          export PATH="{{ "${{ env.CUDA_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CUDA_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------CMAKE---------------"
+          export PATH="{{ "${{ env.CMAKE_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CMAKE_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------source conda env---------------"
+          source activate {{ "${{ env.CONDA_ENV}}" }}
+          echo "---------------info---------------"
+          python -V 
+          conda list
+          nvidia-smi
+          ifconfig
+      - name: start a job
+        run: |
+          echo x-x-x-x-x-x-x-x-x-x-x {{ "${{ env.DATE}}" }} x-x-x-x-x-x-x-x-x-x-x
+          echo "---------------source bash---------------"
+          . ~/.bashrc
+          echo "---------------CUDA---------------"
+          export PATH="{{ "${{ env.CUDA_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CUDA_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------CMAKE---------------"
+          export PATH="{{ "${{ env.CMAKE_HOME}}" }}/bin:$PATH"
+          export LD_LIBRARY_PATH="{{ "${{ env.CMAKE_HOME}}" }}/lib64:$LD_LIBRARY_PATH"
+          echo "---------------source conda env---------------"
+          source activate {{ "${{ env.CONDA_ENV}}" }}
+          echo "---------------run experiments---------------"
+          cd {{ "${{ env.WORKSPACE}}" }}
+          poetry run train
+          # poetry run experiments --config={{ "${{ env.CONFIG}}" }} --selected="{{ "${{ env.EXPERIMENTS}}" }}"
