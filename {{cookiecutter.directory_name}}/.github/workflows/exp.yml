@@ -3,8 +3,8 @@ on:
   push:
     branches: [ exp ]
 jobs:
-  build_on_{{cookiecutter.runner_slug}}:
-    runs-on: [ {{cookiecutter.runner_slug}} ]
+  build_on_{{cookiecutter.runner_name}}:
+    runs-on: [ {{cookiecutter.runner_name}} ]
     timeout-minutes: 4320
     defaults:
       run:

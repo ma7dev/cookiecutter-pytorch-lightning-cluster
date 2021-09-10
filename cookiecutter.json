@@ -1,10 +1,13 @@
 {
     "directory_name": "project",
-    "project_name": "Project X",
-    "project_slug": "project_x",
-    "runner_slug": "runner_1",
+    "project_name": "Sample Project",
+    "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '_') }}",
+    "pkg_name": "{{ cookiecutter.project_name|lower|replace(' ', '-') }}",
+    "license": ["AGPL-3.0", "APACHE-2.0", "BSD-2-CLAUSE", "BSD-3-CLAUSE", "BSL-1.0", "CC0-1.0", "EPL-2.0", "GPL-2.0", "GPL-3.0", "LGPL-2.1", "MIT", "MPL-2.0", "UNLICENSE"],
+    "runner_name": "runner_1",
     "project_version": "0.1.0",
     "author_name": "John Smith",
     "author_email": "example@email.com",
-    "github_username": "username"
+    "github_username": "username",
+    "github_repo": "{{ cookiecutter.project_slug }}"
 }

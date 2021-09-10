@@ -3,8 +3,8 @@
 ## Instructions
 
 ```bash
-# install cookiecutter
-pip install cookiecutter
+# install packages
+pip install cookiecutter requests
 
 # render the template
 cookiecutter https://github.com/sudomaze/cookiecutter-pytorch-lightning-cluster.git
